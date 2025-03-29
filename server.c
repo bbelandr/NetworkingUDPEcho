@@ -50,6 +50,7 @@ uint32_t receivedCount = 0;
 uint32_t RxErrorCount = 0;
 uint32_t TxErrorCount = 0;
 uint32_t  numberOutOfOrder=0;
+uint16_t opMode = 0;
 
 
 double OWDSum = 0.0;
@@ -158,6 +159,7 @@ int main(int argc, char *argv[])
       msgHeaderPtr->sequenceNum = ntohl(*myBufferIntPtr++);
       msgHeaderPtr->timeSentSeconds = ntohl(*myBufferIntPtr++);
       msgHeaderPtr->timeSentNanoSeconds = ntohl(*myBufferIntPtr++);
+      msgHeaderPtr->opMode = ntohl(*myBufferIntPtr++);
 
 
       //Current wallclock time - packet send time
@@ -166,6 +168,7 @@ int main(int argc, char *argv[])
       OWDSum += OWDSample;
       numberOWDSamples++;
       smoothedOWD = (1-alpha)*smoothedOWD + alpha*OWDSample;
+      opMode = msgHeaderPtr->opMode;
 
       if (msgHeaderPtr->sequenceNum > largestSeqRecv)
           largestSeqRecv = msgHeaderPtr->sequenceNum;
@@ -232,11 +235,27 @@ void CNTCCode()
   }
 
   //A1
-  printf("UDPEchoV2:Server:Summary:  %12.6f %6.6f %4.9f %2.4f %d %d %d %6.0f %d %d %d\n",
+  double avgObservedThroughput = 0.0;
+  if (opMode == 0) {
+    printf("UDPEchoV2:Server:Summary:  %12.6f %6.6f %4.9f %2.4f %d %d %d %6.0f %d %d %d\n",
         wallTime, duration, avgOWD, avgLossRate, numberOfTrials, receivedCount, largestSeqRecv, totalLost,
         RxErrorCount, TxErrorCount, numberOutOfOrder);
-
-  exit(0);
+  }
+  else if (opMode == 1) {
+    avgObservedThroughput = receivedCount / duration;
+    printf("UDPEchoV2:Server:Summary:  %12.6f %6.6f %4.9f %2.4f %d %d %d %6.0f %d %d %d\n",
+      wallTime, duration, avgOWD, avgObservedThroughput, avgLossRate, numberOfTrials, receivedCount, largestSeqRecv, totalLost,
+      RxErrorCount, TxErrorCount, numberOutOfOrder);
+    }
+  /*
+  if (opMode == 1) {
+    print avgOWD and then immediately avgObservedThroughput;
+  }
+  if (opMode == 0) {
+    avgObservedThroughput = 0;
+  }
+  */
+        exit(0);
 }
 
 
