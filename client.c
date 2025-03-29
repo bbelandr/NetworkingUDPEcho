@@ -209,7 +209,15 @@ int main(int argc, char *argv[])
 //outputFile
   if (argc > 7) {
     outputFile = argv[7];
+    // Redirecting stdout to outputFile
+    freopen(outputFile, "w", stdout);
   }
+
+  /*
+    if (opMode == 1) {
+      avgRTT = 0;
+    }
+  */
 
   signal (SIGINT, clientCNTCCode);
 
