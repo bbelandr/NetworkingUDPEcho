@@ -56,6 +56,7 @@ int sock = -1;                         /* Socket descriptor */
 double startTime = 0.0;
 double endTime = 0.0;
 
+char* outputFile = NULL;
 uint16_t opMode = 0;
 
 //Stats and counters - these are global as the asynchronous handlers need access
@@ -161,7 +162,6 @@ int main(int argc, char *argv[])
   messageHeaderDefault *RxHeaderPtr=NULL;
   uint32_t count = 0;
 
-  char* outputFile;
 
 
   if (argc <= 3)    /* need at least server name and port */
@@ -212,12 +212,6 @@ int main(int argc, char *argv[])
     // Redirecting stdout to outputFile
     freopen(outputFile, "w", stdout);
   }
-
-  /*
-    if (opMode == 1) {
-      avgRTT = 0;
-    }
-  */
 
   signal (SIGINT, clientCNTCCode);
 
@@ -382,13 +376,14 @@ int main(int argc, char *argv[])
     TxHeaderPtr->sequenceNum = sequenceNumber++;
     TxHeaderPtr->timeSentSeconds = msgTxTime.tv_sec;
     TxHeaderPtr->timeSentNanoSeconds = msgTxTime.tv_nsec;
+    TxHeaderPtr->opMode = opMode;       // Updated to also include the opMode
 
     //pack the header into the network buffer
     TxIntPtr  = (uint32_t *) TxBuffer;
     *TxIntPtr++  = htonl(TxHeaderPtr->sequenceNum);
     *TxIntPtr++  = htonl(TxHeaderPtr->timeSentSeconds);
     *TxIntPtr++  = htonl(TxHeaderPtr->timeSentNanoSeconds);
-
+    *TxIntPtr++  = htonl(TxHeaderPtr->opMode);
     rc = NOERROR;
     numberOfTrials++;
     if ( (!loopForever) &&  (numberOfTrials > nIterations) )
@@ -511,12 +506,26 @@ void clientCNTCCode()
 //uint32_t numberOutOfOrder=0;
 //uint32_t numberTOs=0;
 //incremented by the rx seq number - nest rx seq number 
+  if (outputFile != NULL) {
+    freopen("/dev/tty", "w", stdout); // resetting stdout to print back to the terminal
+  }
   printf("UDPEchoV2:Client:Summary:  %12.6f %6.6f %4.9f %2.4f %d %d %d %d %6.0f %d %d %d \n",
           wallTime, duration, avgRTT, avgLossRate, numberOfTrials, receivedCount, numberRTTSamples,numberTOs, totalLost,
              RxErrorCount, TxErrorCount, numberOutOfOrder);
 
   exit(0);
 }
+
+/*
+  if (opMode == 1) {
+    avgRTT = 0;
+    print avgRTT and then immediately avgActualSendRate;
+  }
+  if (opMode == 0) {
+    avgActualSendRate = 0;
+  }
+  HINT: When computing the avg rates, make sure when you divide the total number of bytes sent / received by the total time using the most accurate time that is possible. 
+*/
 
 
 

@@ -73,6 +73,7 @@ typedef struct {
   uint32_t sequenceNum;
   uint32_t timeSentSeconds;
   uint32_t timeSentNanoSeconds;
+  uint16_t opMode;
 } messageHeaderDefault;
 
 
