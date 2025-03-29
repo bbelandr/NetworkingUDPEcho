@@ -56,7 +56,7 @@ int sock = -1;                         /* Socket descriptor */
 double startTime = 0.0;
 double endTime = 0.0;
 
-
+uint16_t opMode = 0;
 
 //Stats and counters - these are global as the asynchronous handlers need access
 uint32_t numberOfTrials=0; /*counts number of attempts */
@@ -90,7 +90,7 @@ void myUsage()
 {
 
 
-  printf("UDPEchoV2:client(v%s): <Server IP> <Server Port> <Iteration Delay (usecs)> <Message Size (bytes)>] <# of iterations> \n",
+  printf("UDPEchoV2:client(v%s): <Server IP> <Server Port> <Iteration Delay (usecs)> <Message Size (bytes)>] <# of iterations> <opMode> 'outputFile'\n",
                 Version);
 }
 
