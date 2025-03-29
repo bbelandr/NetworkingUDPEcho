@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
   messageHeaderDefault *RxHeaderPtr=NULL;
   uint32_t count = 0;
 
-
+  char* outputFile;
 
 
   if (argc <= 3)    /* need at least server name and port */
@@ -201,7 +201,16 @@ int main(int argc, char *argv[])
       loopForever=true;
   }
 
+//OpMode
+  if (argc > 6) {
+    opMode = atoi(argv[6]);
+  }
 
+//outputFile
+  if (argc > 7) {
+    outputFile = argv[7];
+  }
+  printf("%s and %d", outputFile, opMode);
 
   signal (SIGINT, clientCNTCCode);
 
