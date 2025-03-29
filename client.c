@@ -210,7 +210,6 @@ int main(int argc, char *argv[])
   if (argc > 7) {
     outputFile = argv[7];
   }
-  printf("%s and %d", outputFile, opMode);
 
   signal (SIGINT, clientCNTCCode);
 
