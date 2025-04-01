@@ -59,6 +59,8 @@ uint32_t numberOWDSamples=0;
 //uncomment to see debug output
 //#define TRACE 1
 
+size_t totalBytesRecieved = 0;
+
 int main(int argc, char *argv[]) 
 {
 
@@ -141,6 +143,7 @@ int main(int argc, char *argv[])
     // Size of received message
     ssize_t numBytesRcvd = recvfrom(sock, buffer, MAX_DATA_BUFFER, 0,
         (struct sockaddr *) &clntAddr, &clntAddrLen);
+    totalBytesRecieved += numBytesRcvd;
     if (numBytesRcvd < 0){
       RxErrorCount++;
       perror("server: Error on recvfrom ");
@@ -242,7 +245,7 @@ void CNTCCode()
         RxErrorCount, TxErrorCount, numberOutOfOrder);
   }
   else if (opMode == 1) {
-    avgObservedThroughput = receivedCount / duration;
+    avgObservedThroughput = totalBytesRecieved / duration;
     printf("UDPEchoV2:Server:Summary:  %12.6f %6.6f %4.9f %4.9f %2.4f %d %d %d %6.0f %d %d %d\n",
       wallTime, duration, avgOWD, avgObservedThroughput, avgLossRate, numberOfTrials, receivedCount, largestSeqRecv, totalLost,
       RxErrorCount, TxErrorCount, numberOutOfOrder);
