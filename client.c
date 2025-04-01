@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
   int rtnVal = 0;
   int sock = -1;
   struct sigaction handler; // Signal handler
-  ssize_t numBytes = 0;     // Measures the number of bytes sent during operation
+  ssize_t numBytes = 0;
   struct sockaddr_storage fromAddr; // Source address of server
   socklen_t fromAddrLen = 0;
   char *TxBuffer = NULL;
@@ -410,61 +410,61 @@ int main(int argc, char *argv[])
 //#endif
         continue;
     }
-    if (opMode == 0) {
-      // Receive a response
 
-      // Set length of from address structure (in-out parameter)
-      fromAddrLen = sizeof(fromAddr);
-      alarm(TIMEOUT_SECS); // Set the timeout
+    // Receive a response
 
-      //returns -1 on error else bytes received
-      rc =  recvfrom(sock, RxBuffer, messageSize, 0, (struct sockaddr *) &fromAddr, &fromAddrLen);
-      if (rc == ERROR) {
-        if (errno == EINTR) {     // Alarm went off
-  //#ifdef TRACEME
-            printf("client: recvfrom error EINTR, numberTOs:%d \n",numberTOs);
-  //#endif
-          rc = NOERROR;
-          continue;
-        } else {
-          RxErrorCount++;
-  //#ifdef TRACEME
-            perror("client: recvfrom other error \n");
-  //#endif
-        }
+    // Set length of from address structure (in-out parameter)
+    fromAddrLen = sizeof(fromAddr);
+    alarm(TIMEOUT_SECS); // Set the timeout
+
+    //returns -1 on error else bytes received
+    rc =  recvfrom(sock, RxBuffer, messageSize, 0, (struct sockaddr *) &fromAddr, &fromAddrLen);
+    if (rc == ERROR) {
+      if (errno == EINTR) {     // Alarm went off
+//#ifdef TRACEME
+          printf("client: recvfrom error EINTR, numberTOs:%d \n",numberTOs);
+//#endif
+         rc = NOERROR;
+         continue;
+      } else {
+        RxErrorCount++;
+//#ifdef TRACEME
+          perror("client: recvfrom other error \n");
+//#endif
       }
-      else {
-        //succeeded!
-        numBytes=rc;
-        alarm(0);
-  //Obtain RTT sample
-        Tstop =  getTimestampD();
-        RTTSample= Tstop - Tstart;
-        RTTSum += RTTSample;
-        numberRTTSamples++;
-        smoothedRTT = (1-alpha)*smoothedRTT + alpha*RTTSample;
-        rc = NOERROR;
-        receivedCount++;
-        wallTime = getCurTimeD();
-
-        RxIntPtr  = (uint32_t *) RxBuffer;
-        RxHeaderPtr->sequenceNum =  ntohl(*RxIntPtr++);
-        RxHeaderPtr->timeSentSeconds =  ntohl(*RxIntPtr++);
-        RxHeaderPtr->timeSentNanoSeconds  =  ntohl(*RxIntPtr++);
-
-        printf("%f %4.9f %4.9f %d %d\n", 
-              wallTime, RTTSample, smoothedRTT, 
-              receivedCount,  numberRTTSamples);
-  #ifdef TRACEME
-        printf("client: succeeded to recv %d bytes from server \n", (int) numBytes);
-        printf("Rxed: %d %d %d \n", 
-              RxHeaderPtr->sequenceNum, 
-              RxHeaderPtr->timeSentSeconds, RxHeaderPtr->timeSentNanoSeconds);
-  #endif
-      }
-      //delay requested amount
-      rc = nanosleep((const struct timespec*)&reqDelay, &remDelay);
     }
+    else {
+      //succeeded!
+      numBytes=rc;
+      alarm(0);
+ //Obtain RTT sample
+      Tstop =  getTimestampD();
+      RTTSample= Tstop - Tstart;
+      RTTSum += RTTSample;
+      numberRTTSamples++;
+      smoothedRTT = (1-alpha)*smoothedRTT + alpha*RTTSample;
+      rc = NOERROR;
+      receivedCount++;
+      wallTime = getCurTimeD();
+
+      RxIntPtr  = (uint32_t *) RxBuffer;
+      RxHeaderPtr->sequenceNum =  ntohl(*RxIntPtr++);
+      RxHeaderPtr->timeSentSeconds =  ntohl(*RxIntPtr++);
+      RxHeaderPtr->timeSentNanoSeconds  =  ntohl(*RxIntPtr++);
+
+      printf("%f %4.9f %4.9f %d %d\n", 
+             wallTime, RTTSample, smoothedRTT, 
+             receivedCount,  numberRTTSamples);
+#ifdef TRACEME
+      printf("client: succeeded to recv %d bytes from server \n", (int) numBytes);
+      printf("Rxed: %d %d %d \n", 
+             RxHeaderPtr->sequenceNum, 
+             RxHeaderPtr->timeSentSeconds, RxHeaderPtr->timeSentNanoSeconds);
+#endif
+    }
+    //delay requested amount
+    rc = nanosleep((const struct timespec*)&reqDelay, &remDelay);
+
 
   }
   close(sock);
