@@ -250,9 +250,9 @@ void CNTCCode()
   }
   else if (opMode == 1) {
     avgObservedThroughput = totalBytesRecieved / duration;
-    printf("UDPEchoV2:Server:Summary:  %12.6f %6.6f %4.9f %4.9f %2.4f %d %d %d %6.0f %d %d %d %ld\n",
+    printf("UDPEchoV2:Server:Summary:  %12.6f %6.6f %4.9f %4.9f %2.4f %d %d %d %6.0f %d %d %d\n",
       wallTime, duration, avgOWD, avgObservedThroughput, avgLossRate, numberOfTrials, receivedCount, largestSeqRecv, totalLost,
-      RxErrorCount, TxErrorCount, numberOutOfOrder, totalBytesRecieved);
+      RxErrorCount, TxErrorCount, numberOutOfOrder);
     }
   /*
   if (opMode == 1) {

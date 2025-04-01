@@ -525,7 +525,7 @@ void clientCNTCCode()
     avgActualSendRate = totalBytesSent / duration;
     printf("UDPEchoV2:Client:Summary:  %12.6f %6.6f %4.9f %4.9f %2.4f %d %d %d %d %6.0f %d %d %d %ld\n",
       wallTime, duration, avgRTT, avgActualSendRate, avgLossRate, numberOfTrials, receivedCount, numberRTTSamples,numberTOs, totalLost,
-         RxErrorCount, TxErrorCount, numberOutOfOrder, totalBytesSent);
+         RxErrorCount, TxErrorCount, numberOutOfOrder);
   }
   exit(0);
 }
