@@ -178,12 +178,13 @@ int main(int argc, char *argv[])
 
       if (msgHeaderPtr->sequenceNum > largestSeqRecv)
           largestSeqRecv = msgHeaderPtr->sequenceNum;
-
-      printf("%f %d %d %d %d.%d %3.9f %3.9f\n", wallTime, (int32_t) numBytesRcvd,
-             largestSeqRecv,
-             msgHeaderPtr->sequenceNum,
-             msgHeaderPtr->timeSentSeconds,
-             msgHeaderPtr->timeSentNanoSeconds, OWDSample, smoothedOWD);
+      if (opMode == 0) {
+        printf("%f %d %d %d %d.%d %3.9f %3.9f\n", wallTime, (int32_t) numBytesRcvd,
+               largestSeqRecv,
+               msgHeaderPtr->sequenceNum,
+               msgHeaderPtr->timeSentSeconds,
+               msgHeaderPtr->timeSentNanoSeconds, OWDSample, smoothedOWD);
+      }
   
 #ifdef TRACE 
       printf("server: Rx %d bytes from ", (int32_t) numBytesRcvd);
