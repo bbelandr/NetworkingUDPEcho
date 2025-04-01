@@ -186,18 +186,20 @@ int main(int argc, char *argv[])
       fputc('\n', stdout);
 #endif
 
-      // Send received datagram back to the client
-      ssize_t numBytesSent = sendto(sock, buffer, numBytesRcvd, 0,
-        (struct sockaddr *) &clntAddr, sizeof(clntAddr));
-      if (numBytesSent < 0) {
-        TxErrorCount++;
-        perror("server: Error on sendto ");
-        continue;
-      }
-      else if (numBytesSent != numBytesRcvd) {
-        TxErrorCount++;
-        printf("server: Error on sendto, only sent %d rather than %d ",(int32_t)numBytesSent,(int32_t)numBytesRcvd);
-        continue;
+      if (opMode == 0) {
+        // Send received datagram back to the client
+        ssize_t numBytesSent = sendto(sock, buffer, numBytesRcvd, 0,
+          (struct sockaddr *) &clntAddr, sizeof(clntAddr));
+        if (numBytesSent < 0) {
+          TxErrorCount++;
+          perror("server: Error on sendto ");
+          continue;
+        }
+        else if (numBytesSent != numBytesRcvd) {
+          TxErrorCount++;
+          printf("server: Error on sendto, only sent %d rather than %d ",(int32_t)numBytesSent,(int32_t)numBytesRcvd);
+          continue;
+        }
       }
     }
   }
