@@ -60,6 +60,7 @@ uint32_t numberOWDSamples=0;
 //#define TRACE 1
 
 size_t totalBytesRecieved = 0;
+double timeFirstPacket = 0; // Used for a slightly more accurate calculation of the throughput
 
 int main(int argc, char *argv[]) 
 {
@@ -154,7 +155,9 @@ int main(int argc, char *argv[])
       continue;
     } else 
     { 
-
+      if (receivedCount == 0) {
+        timeFirstPacket = getCurTimeD();
+      }
       receivedCount++;
       wallTime = getCurTimeD();
       myBufferIntPtr  = (uint32_t *)buffer;
@@ -245,7 +248,7 @@ void CNTCCode()
         RxErrorCount, TxErrorCount, numberOutOfOrder);
   }
   else if (opMode == 1) {
-    avgObservedThroughput = totalBytesRecieved / duration;
+    avgObservedThroughput = totalBytesRecieved / endTime - timeFirstPacket;
     printf("UDPEchoV2:Server:Summary:  %12.6f %6.6f %4.9f %4.9f %2.4f %d %d %d %6.0f %d %d %d\n",
       wallTime, duration, avgOWD, avgObservedThroughput, avgLossRate, numberOfTrials, receivedCount, largestSeqRecv, totalLost,
       RxErrorCount, TxErrorCount, numberOutOfOrder);
